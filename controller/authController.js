@@ -40,11 +40,13 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide email and password'), 400);
     }
     const user = await User.findOne({ email: email }).select('password');
-    if (!user || !(await User.checkPassword(password, user.password))) {
+    if (!user || !(await user.checkPassword(password, user.password))) {
         return next(new AppError('Email or password is incorrect'), 400);
     }
-
+    sendJWTToken(user, 200, res);
+});
+exports.forgotPassword = (req, res, next) => {
     res.status(200).json({
         status: 'success',
     });
-});
+};

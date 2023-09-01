@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const validator = require('validator');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -45,5 +47,13 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date,
     passwordChangeAt: Date,
 });
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    this.passwordConfirm = undefined;
+    next();
+});
+userSchema.methods.checkPassword = async (passwordInput, passwordDatabase) =>
+    await bcrypt.compare(passwordInput, passwordDatabase);
 const User = mongoose.model('User', userSchema);
 module.exports = User;

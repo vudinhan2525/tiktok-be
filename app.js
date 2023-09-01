@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const authRoute = require('./routes/authRoute');
+const globalHandleError = require('./controller/errorController');
 
 const app = express();
 if (process.env.NODE_ENV === 'development') {
@@ -15,4 +16,5 @@ app.get('/', (req, res, next) => {
         message: 'Hello from the server',
     });
 });
+app.use(globalHandleError);
 module.exports = app;
